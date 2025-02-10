@@ -1,14 +1,11 @@
 import type { NextConfig } from "next";
 
 const nextConfig: NextConfig = {
-  async rewrites() {
-    return [
-      {
-        source: '/api/:path*',
-        destination: '/api/:path*',
-      },
-    ];
-  },
+  reactStrictMode: true,
+  swcMinify: true,
+  
+  // Explicitly set the source directory structure
+  distDir: '.next'
 };
 
 export default nextConfig;
