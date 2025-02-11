@@ -1,36 +1,51 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Slack Topic Analyzer
+
+A tool that analyzes Slack conversations and visualizes discussion patterns using topic extraction and heatmap visualization.
+
+## Live Demo
+[Slack Topic Analyzer](https://chatter-two-jet.vercel.app/)
+
+## Features
+
+### Topic Extraction
+- Uses OpenAI's GPT models to extract discussion topics from Slack messages
+- Automatically categorizes conversations into relevant themes
+- Real-time topic analysis of sample messages
+
+### Interactive Heatmap
+- Visual representation of discussion intensity across topics and time
+- Color-coded indicators for discussion volume
+- Trend indicators showing topic momentum
+- Suggested ticket creation based on discussion patterns
+- Integration with Linear (coming soon)
+
+## Tech Stack
+- Next.js 15
+- TypeScript
+- Tailwind CSS
+- shadcn/ui components
+- OpenAI API
+- React with Server Components
 
 ## Getting Started
 
-First, run the development server:
+### Prerequisites
+- Node.js (v18 or higher)
+- npm
+- OpenAI API key
 
+### Installation
 ```bash
+# Clone the repository
+git clone https://github.com/stephenenke/chatter.git
+
+# Install dependencies
+cd chatter
+npm install
+
+# Set up environment variables
+cp .env.example .env.local
+# Add your OpenAI API key to .env.local
+
+# Run the development server
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
