@@ -65,10 +65,8 @@ export default function Dashboard() {
   };
 
   useEffect(() => {
-    if (session) {
-      checkSlackConnection();
-    }
-  }, [session]);
+    checkSlackConnection();
+  }, []);
 
   useEffect(() => {
     if (isSlackConnected) {
