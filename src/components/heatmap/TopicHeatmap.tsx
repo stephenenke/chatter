@@ -1,31 +1,32 @@
+'use client';
+
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-//import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { ArrowUp, ArrowDown, MessageCircle, GitPullRequest, Plus, AlertTriangle } from 'lucide-react';
 
-interface SelectedCell {
-  topicIdx: number;
-  dayIdx: number;
-}
+type Message = {
+  user: string;
+  text: string;
+};
 
-interface SuggestedTicket {
+type SuggestedTicket = {
   topic: string;
   day: number;
   suggestion: string;
   reason: string;
-  relevantMessages: Array<{ user: string; text: string; }>;
+  relevantMessages: Message[];
+};
+
+interface CellData {
+  topicIdx: number;
+  dayIdx: number;
 }
 
-interface Message {
-  user: string;
-  text: string;
-}
-
-// Enhanced sample data with suggested tickets
+// Sample data with proper types
 const sampleData = {
   topics: ['Product Roadmap', 'Bug Fixes', 'Feature A', 'UI Updates', 'Performance', 'Customer Feedback'],
   days: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri'],
@@ -63,7 +64,6 @@ const sampleData = {
       { user: 'Lisa', text: 'Im looking into it now' },
     ],
   ],
-  // New: suggested tickets based on discussion analysis
   suggestedTickets: [
     {
       topic: 'Performance',
@@ -90,8 +90,7 @@ const sampleData = {
 
 const TopicHeatmap = () => {
   const [selectedTeam, setSelectedTeam] = useState('all');
-  //const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
-  const [selectedCell, setSelectedCell] = useState<SelectedCell | null>(null);
+  const [selectedCell, setSelectedCell] = useState<CellData | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
   const getColor = (value: number): string => {
@@ -103,26 +102,25 @@ const TopicHeatmap = () => {
     return value > 50 ? 'text-white' : 'text-black';
   };
 
-  const getTrendIcon = (trend: number) => {
+  const getTrendIcon = (trend: number): React.ReactElement | null => {
     if (trend > 0) return <ArrowUp className="w-4 h-4 text-green-500" />;
     if (trend < 0) return <ArrowDown className="w-4 h-4 text-red-500" />;
     return null;
   };
 
-  const getSuggestedTicket = (topicIdx: any, dayIdx: any) => {
+  const getSuggestedTicket = (topicIdx: number, dayIdx: number): SuggestedTicket | undefined => {
     return sampleData.suggestedTickets.find(
       st => sampleData.topics[topicIdx] === st.topic && dayIdx === st.day
     );
   };
 
-  const handleCellClick = (topicIdx: number, dayIdx: number) => {
+  const handleCellClick = (topicIdx: number, dayIdx: number): void => {
     setSelectedCell({ topicIdx, dayIdx });
     setDetailsOpen(true);
   };
 
-  const createTicket = (suggestion: any) => {
+  const createTicket = (suggestion: SuggestedTicket): void => {
     console.log('Creating ticket:', suggestion);
-    // In real implementation: API call to Linear
   };
 
   return (
@@ -131,7 +129,6 @@ const TopicHeatmap = () => {
         <CardTitle>Discussion Topic Heatmap</CardTitle>
       </CardHeader>
       <CardContent className="p-6">
-        {/* Filters */}
         <div className="mb-4 flex space-x-4">
           <Select value={selectedTeam} onValueChange={setSelectedTeam}>
             <SelectTrigger className="w-32">
@@ -146,7 +143,6 @@ const TopicHeatmap = () => {
           </Select>
         </div>
 
-        {/* Heatmap Table */}
         <div className="overflow-x-auto">
           <table className="w-full border-collapse">
             <thead>
@@ -192,7 +188,6 @@ const TopicHeatmap = () => {
           </table>
         </div>
 
-        {/* Legend */}
         <div className="mt-4 flex items-center justify-end space-x-2">
           <span className="text-sm">Discussion Intensity:</span>
           <div className="flex items-center space-x-1">
@@ -209,72 +204,73 @@ const TopicHeatmap = () => {
           </div>
         </div>
 
-        {/* Details Dialog */}
         <Dialog open={detailsOpen} onOpenChange={setDetailsOpen}>
           <DialogContent className="max-w-2xl">
-            <DialogHeader>
-              <DialogTitle>
-                {selectedCell && `${sampleData.topics[selectedCell.topicIdx]} - ${sampleData.days[selectedCell.dayIdx]}`}
-              </DialogTitle>
-            </DialogHeader>
             {selectedCell && (
-              <div className="space-y-4">
-                {/* Suggested Ticket Alert */}
-                {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx) && (
-                  <Alert className="bg-yellow-50 border-yellow-200">
-                    <AlertTriangle className="w-4 h-4 text-yellow-500" />
-                    <AlertTitle>Suggested Linear Ticket</AlertTitle>
-                    <AlertDescription className="mt-2">
-                      <div className="space-y-2">
-                        <p className="font-medium">
-                          {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.suggestion ?? ''}
-                        </p>
-                        <p className="text-sm text-gray-600">
-                          Reason: {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.reason ?? ''}
-                        </p>
-                        <div className="mt-2">
-                          <Button 
-                            size="sm"
-                            onClick={() => createTicket(getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx))}
-                          >
-                            <Plus className="w-4 h-4 mr-2" />
-                            Create Ticket
-                          </Button>
+              <>
+                <DialogHeader>
+                  <DialogTitle>
+                    {`${sampleData.topics[selectedCell.topicIdx]} - ${sampleData.days[selectedCell.dayIdx]}`}
+                  </DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx) && (
+                    <Alert className="bg-yellow-50 border-yellow-200">
+                      <AlertTriangle className="w-4 h-4 text-yellow-500" />
+                      <AlertTitle>Suggested Linear Ticket</AlertTitle>
+                      <AlertDescription className="mt-2">
+                        <div className="space-y-2">
+                          <p className="font-medium">
+                            {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.suggestion}
+                          </p>
+                          <p className="text-sm text-gray-600">
+                            Reason: {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.reason}
+                          </p>
+                          <div className="mt-2">
+                            <Button 
+                              size="sm"
+                              onClick={() => {
+                                const ticket = getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx);
+                                if (ticket) createTicket(ticket);
+                              }}
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              Create Ticket
+                            </Button>
+                          </div>
                         </div>
-                      </div>
-                    </AlertDescription>
-                  </Alert>
-                )}
+                      </AlertDescription>
+                    </Alert>
+                  )}
 
-                {/* Existing Tickets */}
-                <div className="border rounded p-4">
-                  <h3 className="font-semibold mb-2">Related Tickets</h3>
-                  <div className="space-y-2">
-                    {sampleData.tickets[selectedCell.topicIdx].map(ticket => (
-                      <div key={ticket} className="flex items-center space-x-2">
-                        <GitPullRequest className="w-4 h-4" />
-                        <span>{ticket}</span>
-                      </div>
-                    ))}
+                  <div className="border rounded p-4">
+                    <h3 className="font-semibold mb-2">Related Tickets</h3>
+                    <div className="space-y-2">
+                      {sampleData.tickets[selectedCell.topicIdx].map(ticket => (
+                        <div key={ticket} className="flex items-center space-x-2">
+                          <GitPullRequest className="w-4 h-4" />
+                          <span>{ticket}</span>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+
+                  <div className="border rounded p-4">
+                    <h3 className="font-semibold mb-2">Recent Messages</h3>
+                    <div className="space-y-2">
+                      {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.relevantMessages.map((msg, idx) => (
+                        <div key={idx} className="flex items-start space-x-2">
+                          <MessageCircle className="w-4 h-4 mt-1" />
+                          <div>
+                            <span className="font-medium">{msg.user}: </span>
+                            <span>{msg.text}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
                   </div>
                 </div>
-
-                {/* Messages */}
-                <div className="border rounded p-4">
-                  <h3 className="font-semibold mb-2">Recent Messages</h3>
-                  <div className="space-y-2">
-                    {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.relevantMessages.map((msg, idx) => (
-                      <div key={idx} className="flex items-start space-x-2">
-                        <MessageCircle className="w-4 h-4 mt-1" />
-                        <div>
-                          <span className="font-medium">{msg.user}: </span>
-                          <span>{msg.text}</span>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </div>
-              </div>
+              </>
             )}
           </DialogContent>
         </Dialog>
