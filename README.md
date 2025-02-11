@@ -6,6 +6,7 @@ After the initial MVP, I will begin adding Linear ticket suggestions if we do no
 
 ## Live Demo
 [Slack Topic Analyzer](https://chatter-two-jet.vercel.app/)
+
 *This is primarily a UI prototype. Currently working on OpenAI topic extraction.
 ## Features
 
