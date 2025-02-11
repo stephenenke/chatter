@@ -1,6 +1,6 @@
 import * as React from "react"
 import { ChevronLeft, ChevronRight } from "lucide-react"
-import { DayPicker, ButtonProps } from "react-day-picker"
+import { DayPicker } from "react-day-picker" // Remove ButtonProps import
 import { cn } from "@/lib/utils"
 import { buttonVariants } from "@/components/ui/button"
 
@@ -54,7 +54,7 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        // @ts-ignore - DayPicker types are incorrect
+        // @ts-expect-error - DayPicker types need updating
         IconLeft,
         IconRight
       }}
