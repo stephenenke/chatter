@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
-import { Calendar } from '@/components/ui/calendar';
+//import { Calendar } from '@/components/ui/calendar';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from '@/components/ui/dialog';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
@@ -10,6 +10,19 @@ import { ArrowUp, ArrowDown, MessageCircle, GitPullRequest, Plus, AlertTriangle 
 interface SelectedCell {
   topicIdx: number;
   dayIdx: number;
+}
+
+interface SuggestedTicket {
+  topic: string;
+  day: number;
+  suggestion: string;
+  reason: string;
+  relevantMessages: Array<{ user: string; text: string; }>;
+}
+
+interface Message {
+  user: string;
+  text: string;
 }
 
 // Enhanced sample data with suggested tickets
@@ -77,20 +90,20 @@ const sampleData = {
 
 const TopicHeatmap = () => {
   const [selectedTeam, setSelectedTeam] = useState('all');
-  const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
+  //const [dateRange, setDateRange] = useState({ from: new Date(), to: new Date() });
   const [selectedCell, setSelectedCell] = useState<SelectedCell | null>(null);
   const [detailsOpen, setDetailsOpen] = useState(false);
 
-  const getColor = (value: any) => {
+  const getColor = (value: number): string => {
     const intensity = Math.floor((value / 100) * 255);
     return `rgb(${255 - intensity}, ${255 - intensity}, 255)`;
   };
 
-  const getTextColor = (value: any) => {
+  const getTextColor = (value: number): string => {
     return value > 50 ? 'text-white' : 'text-black';
   };
 
-  const getTrendIcon = (trend: any) => {
+  const getTrendIcon = (trend: number) => {
     if (trend > 0) return <ArrowUp className="w-4 h-4 text-green-500" />;
     if (trend < 0) return <ArrowDown className="w-4 h-4 text-red-500" />;
     return null;
@@ -131,10 +144,6 @@ const TopicHeatmap = () => {
               <SelectItem value="design">Design</SelectItem>
             </SelectContent>
           </Select>
-
-          <Button variant="outline" onClick={() => setDateRange({ from: new Date(), to: new Date() })}>
-            Select Date Range
-          </Button>
         </div>
 
         {/* Heatmap Table */}

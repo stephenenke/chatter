@@ -6,6 +6,17 @@ import { buttonVariants } from "@/components/ui/button"
 
 export type CalendarProps = React.ComponentProps<typeof DayPicker>
 
+interface NavigationIconProps {
+  direction: 'previous' | 'next';
+}
+
+const NavigationIcon: React.FC<NavigationIconProps> = ({ direction }) => {
+  if (direction === 'previous') {
+    return <ChevronLeft className="h-4 w-4" />;
+  }
+  return <ChevronRight className="h-4 w-4" />;
+};
+
 function Calendar({
   className,
   classNames,
@@ -51,15 +62,14 @@ function Calendar({
         ...classNames,
       }}
       components={{
-        NavigationIcon: (props: { direction: 'previous' | 'next' }) => 
-          props.direction === 'previous' ? 
-            <ChevronLeft className="h-4 w-4" /> : 
-            <ChevronRight className="h-4 w-4" />
+        IconLeft: () => <NavigationIcon direction="previous" />,
+        IconRight: () => <NavigationIcon direction="next" />,
       }}
       {...props}
     />
   )
 }
+
 Calendar.displayName = "Calendar"
 
 export { Calendar }

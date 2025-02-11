@@ -1,5 +1,5 @@
 // This is a simple in-memory store. In production, use a database
-let slackTokens: { [userId: string]: string } = {};
+const slackTokens: { [userId: string]: string } = {};
 
 export const SlackTokenManager = {
   setToken: (userId: string, token: string) => {
