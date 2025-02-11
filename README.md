@@ -2,7 +2,7 @@
 
 Ever wish you could keep track of all of that dev chatter? What about tracking and classifying your support chatbot? Introudcing Chatter: a tool that analyzes Slack conversations and visualizes discussion patterns using topic extraction and heatmap visualization.
 
-After the initial MVP, I will begin adding Linear ticket suggestions if we do not find likely correpsonding tickets. That way, when you start talking about a new bug in the dev channel, you can easily create a corresponding ticket.
+After the initial MVP, I will begin adding Linear ticket suggestions if we do not find likely corresponding tickets. That way, when you start talking about a new bug in the dev channel, you can easily create a corresponding ticket.
 
 ## Live Demo
 [Slack Topic Analyzer](https://chatter-two-jet.vercel.app/)
