@@ -376,10 +376,74 @@ const TopicHeatmap: React.FC<TopicHeatmapProps> = ({
                           <p className="text-sm text-gray-600">
                             Reason: {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.reason}
                           </p>
+                          <div className="mt-2">
+                            <Button 
+                              size="sm"
+                              onClick={() => {
+                                const ticket = getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx);
+                                if (ticket) createTicket(ticket);
+                              }}
+                            >
+                              <Plus className="w-4 h-4 mr-2" />
+                              Create Ticket
+                            </Button>
+                          </div>
                         </div>
                       </AlertDescription>
                     </Alert>
                   )}
+
+                  {/* Summary section */}
+                  <div className="border rounded p-4">
+                    <h3 className="font-semibold mb-2">
+                      Discussion Summary
+                      {isSummarizing && <Loader2 className="ml-2 h-4 w-4 inline animate-spin" />}
+                    </h3>
+                    <div className="prose max-w-none">
+                      {summary ? (
+                        <div className="space-y-2 text-sm">
+                          {summary.split('\n').map((line, i) => (
+                            <p key={i}>{line}</p>
+                          ))}
+                        </div>
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">
+                          {isSummarizing ? 'Generating summary...' : 'No summary available'}
+                        </p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="border rounded p-4">
+                    <h3 className="font-semibold mb-2">Related Tickets</h3>
+                    <div className="space-y-2">
+                      {tickets[selectedCell.topicIdx]?.length > 0 ? (
+                        tickets[selectedCell.topicIdx].map(ticket => (
+                          <div key={ticket} className="flex items-center space-x-2">
+                            <GitPullRequest className="w-4 h-4" />
+                            <span>{ticket}</span>
+                          </div>
+                        ))
+                      ) : (
+                        <p className="text-sm text-gray-500 italic">No related tickets found</p>
+                      )}
+                    </div>
+                  </div>
+
+                  <div className="border rounded p-4">
+                    <h3 className="font-semibold mb-2">Recent Messages</h3>
+                    <div className="space-y-2">
+                      {getSuggestedTicket(selectedCell.topicIdx, selectedCell.dayIdx)?.relevantMessages.map((msg, idx) => (
+                        <div key={idx} className="flex items-start space-x-2">
+                          <MessageCircle className="w-4 h-4 mt-1" />
+                          <div>
+                            <span className="font-medium">{msg.user}: </span>
+                            <span>{msg.text}</span>
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
                 </div>
               </>
             )}
