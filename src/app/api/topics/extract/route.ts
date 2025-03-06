@@ -1,38 +1,39 @@
-import { extractTopicsFromMessages, summarizeTopicMessages, suggestTicketsFromMessages } from '@/lib/topic-extractor';
+import { extractTopicsFromMessages } from '@/lib/topic-extractor';
 import { Message } from '@/types';
 import { NextRequest } from 'next/server';
+import { getServerSession } from 'next-auth';
+import { authOptions } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { messages, topic } = await request.json();
+    // Validate session (middleware already handles this, but as a backup)
+    const session = await getServerSession(authOptions);
+    if (!session) {
+      return Response.json({ error: 'Unauthorized' }, { status: 401 });
+    }
+
+    const { messages } = await request.json();
     
     // Validate request
     if (!Array.isArray(messages)) {
       return Response.json({ error: 'Messages must be an array' }, { status: 400 });
     }
+
+    // Convert string messages to Message objects if needed
+    const messageObjects: Message[] = messages.map(msg => {
+      if (typeof msg === 'string') {
+        // For backward compatibility with string messages
+        return { user: 'Unknown', text: msg };
+      }
+      return msg;
+    });
     
-    // Determine which analysis to perform based on the presence of 'topic'
-    if (topic) {
-      // If a topic is provided, summarize messages for that topic
-      const summary = await summarizeTopicMessages(topic, messages);
-      
-      // Generate ticket suggestion
-      const ticketSuggestion = await suggestTicketsFromMessages(topic, messages);
-      
-      return Response.json({ 
-        summary,
-        suggestion: ticketSuggestion.suggestion,
-        reason: ticketSuggestion.reason
-      });
-    } else {
-      // If no topic is provided, extract topics from messages
-      const topics = await extractTopicsFromMessages(messages);
-      return Response.json({ topics });
-    }
+    const topics = await extractTopicsFromMessages(messageObjects);
+    return Response.json({ topics });
   } catch (error) {
-    console.error('Analysis error:', error);
+    console.error('Topic extraction error:', error);
     return Response.json(
-      { error: error instanceof Error ? error.message : 'An unknown error occurred' }, 
+      { error: error instanceof Error ? error.message : 'Failed to extract topics' }, 
       { status: 500 }
     );
   }

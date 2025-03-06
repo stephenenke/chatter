@@ -1,6 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
+import { useSession, signOut } from 'next-auth/react';
 import { Card, CardHeader, CardTitle, CardContent } from '@/components/ui/card';
 import { Button } from '@/components/ui/button';
 import { Alert, AlertDescription } from '@/components/ui/alert';
@@ -8,10 +9,20 @@ import { Calendar } from '@/components/ui/calendar';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import TopicHeatmap from '@/components/heatmap/TopicHeatmap';
 import { SlackChannel, Message } from '@/types';
-import { GitPullRequest, MessageCircle, Calendar as CalendarIcon } from 'lucide-react';
+import { GitPullRequest, MessageCircle, Calendar as CalendarIcon, LogOut, User } from 'lucide-react';
 import { format } from 'date-fns';
+import {
+  DropdownMenu,
+  DropdownMenuContent,
+  DropdownMenuItem,
+  DropdownMenuLabel,
+  DropdownMenuSeparator,
+  DropdownMenuTrigger,
+} from "@/components/ui/dropdown-menu";
 
 export default function Home() {
+  const { data: session } = useSession();
+  
   // State for Slack connection
   const [isSlackConnected, setIsSlackConnected] = useState(false);
   const [channels, setChannels] = useState<SlackChannel[]>([]);
@@ -34,8 +45,10 @@ export default function Home() {
 
   // Check Slack connection on mount
   useEffect(() => {
-    checkSlackConnection();
-  }, []);
+    if (session) {
+      checkSlackConnection();
+    }
+  }, [session]);
 
   // Fetch channels when Slack is connected
   useEffect(() => {
@@ -120,6 +133,10 @@ export default function Home() {
     }
   };
 
+  const handleSignOut = () => {
+    signOut({ callbackUrl: '/auth/signin' });
+  };
+
   return (
     <div className="min-h-screen bg-gray-50">
       <nav className="bg-white shadow-sm">
@@ -128,14 +145,46 @@ export default function Home() {
             <div className="flex items-center">
               <h1 className="text-xl font-bold">Slack Topic Analyzer</h1>
             </div>
-            <a 
-              href="https://github.com/stephenenke/chatter" 
-              target="_blank"
-              rel="noopener noreferrer"
-              className="flex items-center text-gray-500 hover:text-gray-700"
-            >
-              GitHub
-            </a>
+            <div className="flex items-center space-x-4">
+              <a 
+                href="https://github.com/stephenenke/chatter" 
+                target="_blank"
+                rel="noopener noreferrer"
+                className="text-gray-500 hover:text-gray-700"
+              >
+                GitHub
+              </a>
+              
+              {session && (
+                <DropdownMenu>
+                  <DropdownMenuTrigger asChild>
+                    <Button variant="ghost" size="sm" className="relative h-8 w-8 rounded-full">
+                      {session.user?.image ? (
+                        <img 
+                          src={session.user.image} 
+                          alt={session.user.name || 'User'} 
+                          className="h-8 w-8 rounded-full"
+                        />
+                      ) : (
+                        <User className="h-5 w-5" />
+                      )}
+                    </Button>
+                  </DropdownMenuTrigger>
+                  <DropdownMenuContent align="end">
+                    <DropdownMenuLabel>My Account</DropdownMenuLabel>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem disabled>
+                      {session.user?.name || session.user?.email}
+                    </DropdownMenuItem>
+                    <DropdownMenuSeparator />
+                    <DropdownMenuItem onClick={handleSignOut}>
+                      <LogOut className="mr-2 h-4 w-4" />
+                      Sign out
+                    </DropdownMenuItem>
+                  </DropdownMenuContent>
+                </DropdownMenu>
+              )}
+            </div>
           </div>
         </div>
       </nav>
@@ -220,21 +269,21 @@ export default function Home() {
                             <p className="text-sm mb-1">Start Date</p>
                             <Calendar
                               mode="single"
-                              selected={startDate || undefined}
-                              onSelect={(date: Date | undefined) => setStartDate(date || null)}
+                              selected={startDate}
+                              onSelect={setStartDate}
                               initialFocus
-                              required={false}
                             />
                           </div>
                           <div>
                             <p className="text-sm mb-1">End Date</p>
                             <Calendar
                               mode="single"
-                              selected={endDate || undefined}
-                              onSelect={(date: Date | undefined) => setEndDate(date || null)}
+                              selected={endDate}
+                              onSelect={setEndDate}
                               initialFocus
-                              required={false}
-                              disabled={(date) => startDate ? date < startDate : false}
+                              disabled={(date) => 
+                                startDate ? date < startDate : false
+                              }
                             />
                           </div>
                         </div>
