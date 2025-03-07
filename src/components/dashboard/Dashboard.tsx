@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-//import { useSession } from 'next-auth/react';
+import { useSession } from 'next-auth/react';
 import TopicHeatmap from '@/components/heatmap/TopicHeatmap';
 import { Button } from '@/components/ui/button';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
@@ -15,7 +15,7 @@ interface Channel {
 }
 
 export default function Dashboard() {
-  //const { data: session } = useSession();
+  const { data: session } = useSession();
   const [channels, setChannels] = useState<Channel[]>([]);
   const [selectedChannel, setSelectedChannel] = useState('');
   const [isSlackConnected, setIsSlackConnected] = useState(false);

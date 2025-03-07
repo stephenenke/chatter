@@ -269,21 +269,21 @@ export default function Home() {
                             <p className="text-sm mb-1">Start Date</p>
                             <Calendar
                               mode="single"
-                              selected={startDate}
-                              onSelect={setStartDate}
+                              selected={startDate || undefined}
+                              onSelect={(date: Date | undefined) => setStartDate(date || null)}
                               initialFocus
+                              required={false}
                             />
                           </div>
                           <div>
                             <p className="text-sm mb-1">End Date</p>
                             <Calendar
                               mode="single"
-                              selected={endDate}
-                              onSelect={setEndDate}
+                              selected={endDate || undefined}
+                              onSelect={(date: Date | undefined) => setEndDate(date || null)}
                               initialFocus
-                              disabled={(date) => 
-                                startDate ? date < startDate : false
-                              }
+                              required={false}
+                              disabled={(date) => startDate ? date < startDate : false}
                             />
                           </div>
                         </div>
