@@ -1,8 +1,23 @@
-import { NextAuthOptions } from "next-auth";
+import { Session, getServerSession } from 'next-auth';
+import type { NextAuthOptions } from 'next-auth';
 import GithubProvider from "next-auth/providers/github";
 import GoogleProvider from "next-auth/providers/google";
 import CredentialsProvider from "next-auth/providers/credentials";
 
+// Add type declaration for extended session
+declare module "next-auth" {
+  interface Session {
+    user: {
+      id: string;
+      name?: string | null;
+      email?: string | null;
+      image?: string | null;
+    }
+  }
+}
+
+// Define auth options here instead of importing from auth.ts
+// This avoids circular dependencies
 export const authOptions: NextAuthOptions = {
   providers: [
     GithubProvider({
@@ -62,21 +77,36 @@ export const authOptions: NextAuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
 };
 
-// Extend the Session and User types
-declare module "next-auth" {
-  interface Session {
-    user: {
-      id: string;
-      name?: string | null;
-      email?: string | null;
-      image?: string | null;
-    };
+/**
+ * Service for handling authentication-related functionality
+ */
+export class AuthService {
+  /**
+   * Get the current user session from the server
+   */
+  static async getSession(): Promise<Session | null> {
+    return getServerSession(authOptions);
   }
-  
-  interface User {
-    id: string;
-    name?: string | null;
-    email?: string | null;
-    image?: string | null;
+
+  /**
+   * Get the current user ID from the session
+   * @throws Error if user is not authenticated
+   */
+  static async getUserId(): Promise<string> {
+    const session = await this.getSession();
+    
+    if (!session?.user?.id) {
+      throw new Error('User not authenticated');
+    }
+    
+    return session.user.id;
+  }
+
+  /**
+   * Check if the current user is authenticated
+   */
+  static async isAuthenticated(): Promise<boolean> {
+    const session = await this.getSession();
+    return !!session?.user;
   }
 }
